@@ -13,6 +13,8 @@
 
         </div>
     </div>
+
+
 @endsection
 
 @section('scripts')
@@ -20,6 +22,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
+            var eventsListUrl = @json(route('events.list'));
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
@@ -29,8 +32,13 @@
                     right: 'dayGridMonth, timeGridWeek, timeGridDay, listDay'
                 },
                 navLinks: true,
-                defaultView: 'timeGridWeek',
                 firstDay: 1,
+                events: {
+                    url: eventsListUrl
+                },
+                eventSourceSuccess: function(response, xhr) {
+                    return response.data;
+                },
                 selectable: true,
                 select: function(info) {
                     //
