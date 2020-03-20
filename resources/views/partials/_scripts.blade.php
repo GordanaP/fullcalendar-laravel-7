@@ -33,6 +33,10 @@
 <!-- Timepicker -->
 <script src="{{ asset('vendor/jonthornton-jquery-timepicker/jquery.timepicker.js') }}"></script>
 
+<!-- Custom -->
+<script src="{{ asset('js/fc_basic.js') }}"></script>
+<script src="{{ asset('js/fc_event.js') }}"></script>
+
 @yield('scripts')
 
 <script>
