@@ -77,7 +77,14 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        //
+        $event->update([
+            'title' => $request->event_title,
+            'start' => $request->event_date . ' '. $request->event_time,
+        ]);
+
+        return response([
+            'event' => $event
+        ]);
     }
 
     /**
