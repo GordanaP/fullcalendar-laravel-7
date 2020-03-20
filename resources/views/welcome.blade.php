@@ -29,6 +29,7 @@
             var eventDate = $('#eventDate');
             var eventTime = $('#eventTime');
             var eventSaveBtn = $('.event-save-btn');
+            var eventDeleteBtn = $('#eventDeleteBtn').hide();
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
@@ -56,6 +57,7 @@
                     eventDate.val(date);
                     eventTime.val(time);
                     eventSaveBtn.attr('id', 'eventStore').text('Save');
+                    eventDeleteBtn.hide();
                 },
                 editable: true,
                 eventClick: function(info) {
@@ -70,6 +72,7 @@
                     eventDate.val(date);
                     eventTime.val(time);
                     eventSaveBtn.attr('id', 'eventUpdate').text('Save changes').val(eventId);
+                    eventDeleteBtn.show().val(eventId);
                 },
             });
 
@@ -117,6 +120,24 @@
 
                     calendarEvent.setProp('title', title);
                     calendarEvent.setDates(start, end);
+                    eventModal.modal('hide');
+                })
+                .fail(function() {
+                    console.log("error");
+                });
+            });
+
+            // Delete event
+            $(document).on('click', '#eventDeleteBtn', function() {
+                var eventId = $(this).val();
+                var eventDeleteUrl = '/events/'+eventId;
+
+                $.ajax({
+                    url: eventDeleteUrl,
+                    type: 'DELETE',
+                })
+                .done(function(response) {
+                    calendar.getEventById(eventId).remove();
                     eventModal.modal('hide');
                 })
                 .fail(function() {

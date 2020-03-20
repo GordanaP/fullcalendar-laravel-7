@@ -35,6 +35,9 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="eventDeleteBtn">
+                    Delete
+                </button>
                 <button type="button" class="btn btn-primary event-save-btn"></button>
                 <button type="button" class="btn btn-secondary"
                 data-dismiss="modal">
