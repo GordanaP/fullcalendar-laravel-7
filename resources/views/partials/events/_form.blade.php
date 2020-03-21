@@ -21,4 +21,25 @@
             </div>
         </div>
     </div>
+
+    <div id="eventOutcomeDiv">
+        <label>Outcome:</label>
+        <div class="form-group pb-0">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="outcome"
+                id="completed" value="completed" checked>
+                <label class="form-check-label" for="completed">Completed</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="outcome"
+                id="canceled" value="canceled">
+                <label class="form-check-label" for="canceled">Canceled</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="outcome"
+                id="missed" value="missed">
+                <label class="form-check-label" for="missed">Missed</label>
+            </div>
+        </div>
+    </div>
 </form>

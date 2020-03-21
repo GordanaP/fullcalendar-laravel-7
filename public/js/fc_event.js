@@ -1,41 +1,101 @@
 /**
- * Add the event to the calendar.
+ * Remove the event from the calendar.
  *
- * @param FullCalendar\EventObject event
- * @param Fullcalendar calendar
- * @param string eventSourceId
+ * @param integer eventId
+ * @param FullCalendar calendar
  */
-function addCalendarEvent(event, calendar, eventSourceId = 'jsonFeedUrl')
+function removeCalendarEvent(eventId, calendar)
 {
-    var eventSource = calendar.getEventSourceById(eventSourceId);
-
-    calendar.addEvent( event, eventSource);
+    calendar.getEventById(eventId).remove();
 }
 
 /**
  * Update the event in the calendar.
  *
- * @param FullCalendar\EventObject event
- * @param Fullcalendar calendar
+ * @param JSONfeed event
+ * @param FullCalendar calendar
  */
 function updateCalendarEvent(event, calendar)
 {
-    var title = event.title;
-    var start = new Date(event.start);
-    var end = new Date(event.end);
-    var calendarEvent = calendar.getEventById(event.id);
+    if(event) {
+        var calendarEvent = calendar.getEventById(event.id);
+        var newStart = new Date(event.start_at);
+        var newEnd = new Date(event.end_at);
 
-    calendarEvent.setProp('title', title);
-    calendarEvent.setDates(start, end);
+        calendarEvent.setExtendedProp('outcome', event.outcome);
+        calendarEvent.setDates(newStart, newEnd);
+    }
 }
 
 /**
- * Remove the event from the calendar.
+ * Add the event to the calendar.
  *
- * @param FullCalendar\EventObject event
- * @param Fullcalendar calendar
+ * @param JSONfeed event
+ * @param FullCalendar calendar
+ * @param string eventSourceId
  */
-function removeCalendarEvent(eventId, calendar)
+function addCalendarEvent(event, calendar, eventSourceId = 'jsonFeedUrl')
 {
-    calendar.getEventById(eventId).remove();
+    var eventObj = transformToEventObj(event);
+    var eventSource = calendar.getEventSourceById(eventSourceId);
+
+    calendar.addEvent( eventObj, eventSource);
+}
+
+/**
+ * Transform to event object.
+ *
+ * @param  JSONfeed event
+ * @return FullCalendar\EventObj
+ */
+function transformToEventObj(event) {
+    event.title = event.title;
+    event.start = event.start_at;
+    event.end = event.end_at;
+    event.outcome = event.outcome;
+
+    return event;
+}
+
+/**
+ * Determine if the event is pending.
+ *
+ * @param  FullCalendar\EventObj  fcEvent
+ * @return boolean
+ */
+function isPending(fcEvent)
+{
+    return fcEvent.extendedProps.outcome == 'pending';
+}
+
+/**
+ * Determine if the event start is past.
+ *
+ * @param  mixed eventStart
+ * @return boolean
+ */
+function isPast(eventStart)
+{
+    var start = moment(eventStart);
+    var now = moment(new Date());
+
+    return start.diff(now, 'minutes') < 0;
+}
+
+/**
+ * Toggle the event related hidden elements presence.
+ *
+ * @param  FullCalendar\EventObj fcEvent
+ * @param  JQuery\Obj eventDeleteBtn
+ * @param  JQuery\Obj eventOutcomeDiv
+ */
+function toggleEventRelatedHiddenElems(fcEvent, eventDeleteBtn, eventOutcomeDiv)
+{
+    if(isPast(fcEvent.start)) {
+        eventDeleteBtn.hide();
+        eventOutcomeDiv.show();
+    } else {
+        eventDeleteBtn.val(fcEvent.id).show();
+        eventOutcomeDiv.hide();
+    }
 }

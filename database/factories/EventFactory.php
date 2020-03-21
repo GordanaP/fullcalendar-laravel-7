@@ -9,6 +9,6 @@ use Faker\Generator as Faker;
 $factory->define(Event::class, function (Faker $faker) {
     return [
         'title' => $faker->word,
-        'start' => $start = Carbon::today()->addDays(rand(1,5))->startOfHour()->addHours(rand(9,15)),
+        'start_at' => Carbon::today()->addDays(rand(1,5))->startOfHour()->addHours(rand(9,15)),
     ];
 });

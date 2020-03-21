@@ -38,7 +38,8 @@ class EventController extends Controller
     {
         $event = Event::create([
             'title' => $request->event_title,
-            'start' => $request->event_date . ' '. $request->event_time,
+            'start_at' => $request->event_date . ' '. $request->event_time,
+            'outcome' => 'pending',
         ]);
 
         return response([
@@ -77,13 +78,10 @@ class EventController extends Controller
      */
     public function update(Request $request, Event $event)
     {
-        $event->update([
-            'title' => $request->event_title,
-            'start' => $request->event_date . ' '. $request->event_time,
-        ]);
+        $updated = $this->updated($event);
 
         return response([
-            'event' => $event
+            'event' => $updated
         ]);
     }
 
@@ -95,10 +93,26 @@ class EventController extends Controller
      */
     public function destroy(Event $event)
     {
-        $event->delete();
+        if(! $event->start_at->isPast())
+        {
+            $event->delete();
+        }
 
         return response([
             'message' => 'Deleted'
         ]);
+    }
+
+    public function updated($event)
+    {
+        if($event->start_at->isPast()) {
+            return tap($event)->update([
+                'outcome' => request('outcome'),
+            ]);
+        } else {
+            return tap($event)->update([
+                'start_at' => request('event_date') . ' '. request('event_time'),
+            ]);
+        }
     }
 }

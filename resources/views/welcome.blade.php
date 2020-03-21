@@ -20,18 +20,24 @@
 @section('scripts')
     <script>
 
+        var eventModal = $('#eventSaveModal');
+        var eventForm = $('#eventSaveForm');
+        var eventTitle = $('#eventTitle');
+        var eventDate = $('#eventDate');
+        var eventTime = $('#eventTime');
+        var eventSaveBtn = $('.event-save-btn');
+        var eventDeleteBtn = $('#eventDeleteBtn').hide();
+        var eventOutcomeRadio = $('input:radio[name=outcome]');
+        var eventOutcomeDiv = $('#eventOutcomeDiv').hide();
+        var hiddenElems = ['#eventDeleteBtn', '#eventOutcomeDiv'];
+
+        eventModal.clearContentOnClose(hiddenElems);
+
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var eventsListUrl = @json(route('events.list'));
-            var eventModal = $('#eventSaveModal');
-            var eventForm = $('#eventSaveForm');
-            var eventTitle = $('#eventTitle');
-            var eventDate = $('#eventDate');
-            var eventTime = $('#eventTime');
             var dateFormat = "YYYY-MM-DD";
             var timeFormat = "HH:mm";
-            var eventSaveBtn = $('.event-save-btn');
-            var eventDeleteBtn = $('#eventDeleteBtn').hide();
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
@@ -51,7 +57,7 @@
                 },
                 selectable: true,
                 select: function(info) {
-                    var selectedStart = infoDatert;
+                    var selectedStart = info.start;
                     var selectedDate = formatDate(selectedStart, dateFormat);
                     var selectedTime = formatDate(selectedStart, timeFormat);
 
@@ -60,7 +66,6 @@
                     eventDate.val(selectedDate);
                     eventTime.val(selectedTime);
                     eventSaveBtn.attr('id', 'eventStoreBtn').text('Save');
-                    eventDeleteBtn.hide();
                 },
                 editable: true,
                 eventClick: function(info) {
@@ -70,13 +75,18 @@
                     var clickedStart = clicked.start;
                     var clickedDate = formatDate(clickedStart, dateFormat);
                     var clickedTime = formatDate(clickedStart, timeFormat);
+                    var clickedOutcome = clicked.extendedProps.outcome;
+                    var eventSaveBtnText =  isPast(clicked) ? 'Submit' : 'Save changes';
 
-                    eventModal.modal('show');
+                    eventModal.open();
                     eventTitle.val(clickedTitle);
                     eventDate.val(clickedDate);
                     eventTime.val(clickedTime);
-                    eventSaveBtn.attr('id', 'eventUpdateBtn').text('Save changes').val(clickedId);
-                    eventDeleteBtn.show().val(clickedId);
+                    checkRadioOption(eventOutcomeRadio, clickedOutcome)
+                    eventSaveBtn.attr('id', 'eventUpdateBtn')
+                        .text(eventSaveBtnText).val(clickedId);
+
+                    toggleEventRelatedHiddenElems(clicked, eventDeleteBtn, eventOutcomeDiv);
                 },
             });
 
@@ -84,7 +94,8 @@
 
             // Add event
             $(document).on('click', '#eventStoreBtn', function(){
-                var eventData = eventForm.serializeArray();
+                var fields = '#eventTitle, #eventDate, #eventTime';
+                var eventData = eventForm.find(fields).serializeArray();
                 var eventStoreUrl = @json(route('events.store'));
 
                 $.ajax({
@@ -104,7 +115,11 @@
             // Update event
             $(document).on('click', '#eventUpdateBtn', function(){
                 var eventId = $(this).val();
-                var eventData = eventForm.serializeArray();
+                var date = eventDate.val();
+                var time = eventTime.val();
+                var eventStart = date + ' ' + time;
+                var fields = isPast(eventStart) ? 'input[name="outcome"]' : '#eventDate, #eventTime';
+                var eventData = eventForm.find(fields).serializeArray();
                 var eventUpdateUrl = '/events/'+eventId;
 
                 $.ajax({
