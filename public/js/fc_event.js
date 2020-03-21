@@ -19,11 +19,15 @@ function updateCalendarEvent(event, calendar)
 {
     if(event) {
         var calendarEvent = calendar.getEventById(event.id);
-        var newStart = new Date(event.start_at);
-        var newEnd = new Date(event.end_at);
+        var eventStart = new Date(event.start_at);
+        var eventEnd = new Date(event.end_at);
+        var eventColor = event.color;
+        var eventOutcome = event.outcome;
 
-        calendarEvent.setExtendedProp('outcome', event.outcome);
-        calendarEvent.setDates(newStart, newEnd);
+        calendarEvent.setProp('backgroundColor', eventColor);
+        calendarEvent.setProp('borderColor', eventColor);
+        calendarEvent.setExtendedProp('outcome', eventOutcome);
+        calendarEvent.setDates(eventStart, eventEnd);
     }
 }
 
@@ -52,7 +56,10 @@ function transformToEventObj(event) {
     event.title = event.title;
     event.start = event.start_at;
     event.end = event.end_at;
+    event.backgroundColor = event.color;
+    event.borderColor = event.color;
     event.outcome = event.outcome;
+    event.editable = event.is_editable;
 
     return event;
 }

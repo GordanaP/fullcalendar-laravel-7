@@ -30,7 +30,7 @@ class Event extends Model
      * @var array
      */
     protected $appends = [
-        'end_at'
+        'end_at', 'color', 'is_editable'
     ];
 
     /**
@@ -39,6 +39,37 @@ class Event extends Model
     public function getEndAtAttribute(): string
     {
         return $this->start_at->addMinutes(30)->toDateTimeString();
+    }
+
+    // public function getRenderingAttribute()
+    // {
+    //     return $this->start_at->isPast() ? 'background' : '';
+    // }
+
+    /**
+     * Get the event color.
+     */
+    public function getColorAttribute(): string
+    {
+        if($this->isCompleted()) {
+            $color = '#68d391';
+        } else if ($this->isCanceled()) {
+            $color = '#fc8181';
+        } else if ($this->isMissed()) {
+            $color = '#cbd5e0';
+        } else {
+            $color = '#90cdf4';
+        }
+
+        return $color;
+    }
+
+    /**
+     * Get the event editable attribute.
+     */
+    public function getIsEditableAttribute(): string
+    {
+        return ! $this->start_at->isPast() ? true : false;
     }
 
     /**

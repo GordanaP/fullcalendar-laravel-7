@@ -56,6 +56,9 @@
                     return response.data;
                 },
                 selectable: true,
+                selectAllow: function(info) {
+                    return isSelectable(info.start);
+                },
                 select: function(info) {
                     var selectedStart = info.start;
                     var selectedDate = formatDate(selectedStart, dateFormat);
@@ -67,7 +70,6 @@
                     eventTime.val(selectedTime);
                     eventSaveBtn.attr('id', 'eventStoreBtn').text('Save');
                 },
-                editable: true,
                 eventClick: function(info) {
                     var clicked = info.event;
                     var clickedId = clicked.id;
@@ -76,7 +78,7 @@
                     var clickedDate = formatDate(clickedStart, dateFormat);
                     var clickedTime = formatDate(clickedStart, timeFormat);
                     var clickedOutcome = clicked.extendedProps.outcome;
-                    var eventSaveBtnText =  isPast(clicked) ? 'Submit' : 'Save changes';
+                    var eventSaveBtnText =  isPast(clickedStart) ? 'Submit' : 'Save changes';
 
                     eventModal.open();
                     eventTitle.val(clickedTitle);
@@ -87,6 +89,35 @@
                         .text(eventSaveBtnText).val(clickedId);
 
                     toggleEventRelatedHiddenElems(clicked, eventDeleteBtn, eventOutcomeDiv);
+                },
+                eventDrop:function(info) {
+                    var dropped = info.event;
+                    var droppedId = dropped.id;
+                    var droppedStart = dropped.start;
+                    var droppedDate = formatDate(droppedStart, dateFormat);
+                    var droppedTime = formatDate(droppedStart, timeFormat);
+                    var eventUpdateUrl = '/events/' + droppedId;
+
+                    var droppedData = {
+                        event_date: droppedDate,
+                        event_time: droppedTime,
+                    }
+
+                    $.ajax({
+                        url: eventUpdateUrl,
+                        type: 'PUT',
+                        data: droppedData,
+                    })
+                    .done(function(response) {
+                        console.log("success");
+                    })
+                    .fail(function() {
+                        console.log("error");
+                    });
+                },
+                eventOverlap: false,
+                eventAllow: function(dropInfo, draggedEvent) {
+                    return isSelectable(dropInfo.start)
                 },
             });
 

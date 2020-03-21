@@ -20,6 +20,9 @@ class EventResource extends JsonResource
             'start' => $this->start_at,
             'end' => $this->end_at,
             'outcome' => $this->outcome,
+            'backgroundColor' => $this->color,
+            'borderColor' => $this->color,
+            'editable' => $this->is_editable
         ];
     }
 }
