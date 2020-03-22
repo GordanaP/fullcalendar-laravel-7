@@ -76,20 +76,6 @@ function isPending(fcEvent)
 }
 
 /**
- * Determine if the event start is past.
- *
- * @param  mixed eventStart
- * @return boolean
- */
-function isPast(eventStart)
-{
-    var start = moment(eventStart);
-    var now = moment(new Date());
-
-    return start.diff(now, 'minutes') < 0;
-}
-
-/**
  * Toggle the event related hidden elements presence.
  *
  * @param  FullCalendar\EventObj fcEvent

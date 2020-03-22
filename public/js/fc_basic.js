@@ -19,5 +19,31 @@ function formatDate(date, format)
  */
 function isSelectable(date)
 {
-    return  ! isPast(date);
+    return  ! isPast(date) &&
+            ! isHoliday(date);
+}
+
+/**
+ * Determine if the given date is Sunday.
+ *
+ * @param  Javascript\Date  date
+ * @return boolean
+ */
+function isSunday(date)
+{
+    return date.getDay() == 0;
+}
+
+/**
+ * Determine if the date is past.
+ *
+ * @param  mixed dateTime
+ * @return boolean
+ */
+function isPast(dateTime)
+{
+    var date = moment(dateTime);
+    var now = moment(new Date());
+
+    return date.diff(now, 'minutes') < 0;
 }

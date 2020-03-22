@@ -1,5 +1,13 @@
 @extends('layouts.app')
 
+@section('links')
+
+    <style>
+        .holiday, .holiday span.ui-state-default { background-color: coral; }
+    </style>
+
+@endsection
+
 @section('content')
     <div class="row">
         <div class="col-md-8">
@@ -36,6 +44,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var eventsListUrl = @json(route('events.list'));
+            var firstWeekDay = 1;
+            var eventLimit = 6;
             var dateFormat = "YYYY-MM-DD";
             var timeFormat = "HH:mm";
 
@@ -47,13 +57,30 @@
                     right: 'dayGridMonth, timeGridWeek, timeGridDay, listDay'
                 },
                 navLinks: true,
-                firstDay: 1,
+                firstDay: firstWeekDay,
+                slotLabelFormat: [
+                    {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: false
+                    }
+                ],
                 eventSources: [{
                     id: 'jsonFeedUrl',
                     url: eventsListUrl,
                 }],
                 eventSourceSuccess: function(response, xhr) {
                     return response.data;
+                },
+                eventLimit: eventLimit,
+                eventTimeFormat: {
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    meridiem: false,
+                    hour12: false
+                },
+                dayRender: function(info) {
+                    highlightHolidays(info);
                 },
                 selectable: true,
                 selectAllow: function(info) {
