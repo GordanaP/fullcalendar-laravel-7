@@ -116,4 +116,3 @@ class AppointmentController extends Controller
         }
     }
 }
-

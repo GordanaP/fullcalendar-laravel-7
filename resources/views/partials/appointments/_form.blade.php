@@ -11,6 +11,8 @@
                 <label for="appDate">Date:</label>
                 <input type="text" name="app_date" id="appDate"
                 class="form-control" placeholder="yyyy-mm-dd">
+
+                <span class="invalid-feedback app_date"></span>
             </div>
         </div>
         <div class="col-md-6">
@@ -18,6 +20,8 @@
                 <label for="appTime">Time:</label>
                 <input type="text" name="app_time" id="appTime"
                 class="form-control" placeholder="hh::mm">
+
+                <span class="invalid-feedback app_time"></span>
             </div>
         </div>
     </div>
@@ -41,5 +45,6 @@
                 <label class="form-check-label" for="missed">Missed</label>
             </div>
         </div>
+        <span class="invalid-feedback app_status"></span>
     </div>
 </form>

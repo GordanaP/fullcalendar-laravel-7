@@ -179,12 +179,12 @@
                 });
             });
 
-            // Update event
+            // Update appointment
             $(document).on('click', '#appUpdateBtn', function(){
                 var appId = $(this).val();
                 var date = appDate.val();
                 var time = appTime.val();
-                var appStart = date + ' ' + time;
+                var appStart = dateTimeString(date, time);
                 var fields = isPast(appStart) ? 'input[name="app_status"]' : '#appDate, #appTime';
                 var appData = appForm.find(fields).serializeArray();
                 var appUpdateUrl = '/appointments/'+appId;
