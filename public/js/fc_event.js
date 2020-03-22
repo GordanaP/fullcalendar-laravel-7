@@ -22,11 +22,11 @@ function updateCalendarEvent(event, calendar)
         var eventStart = new Date(event.start_at);
         var eventEnd = new Date(event.end_at);
         var eventColor = event.color;
-        var eventOutcome = event.outcome;
+        var eventStatus = event.status;
 
         calendarEvent.setProp('backgroundColor', eventColor);
         calendarEvent.setProp('borderColor', eventColor);
-        calendarEvent.setExtendedProp('outcome', eventOutcome);
+        calendarEvent.setExtendedProp('status', eventStatus);
         calendarEvent.setDates(eventStart, eventEnd);
     }
 }
@@ -58,7 +58,7 @@ function transformToEventObj(event) {
     event.end = event.end_at;
     event.backgroundColor = event.color;
     event.borderColor = event.color;
-    event.outcome = event.outcome;
+    event.status = event.status;
     event.editable = event.is_editable;
 
     return event;
@@ -72,7 +72,7 @@ function transformToEventObj(event) {
  */
 function isPending(fcEvent)
 {
-    return fcEvent.extendedProps.outcome == 'pending';
+    return fcEvent.extendedProps.status == 'pending';
 }
 
 /**

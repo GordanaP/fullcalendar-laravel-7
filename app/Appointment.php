@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Event extends Model
+class Appointment extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -12,7 +12,7 @@ class Event extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'start_at', 'outcome'
+        'title', 'start_at', 'status'
     ];
 
     /**
@@ -34,20 +34,15 @@ class Event extends Model
     ];
 
     /**
-     * Get the event end time.
+     * Get the appointment end time.
      */
     public function getEndAtAttribute(): string
     {
         return $this->start_at->addMinutes(30)->toDateTimeString();
     }
 
-    // public function getRenderingAttribute()
-    // {
-    //     return $this->start_at->isPast() ? 'background' : '';
-    // }
-
     /**
-     * Get the event color.
+     * Get the appointment color.
      */
     public function getColorAttribute(): string
     {
@@ -65,7 +60,7 @@ class Event extends Model
     }
 
     /**
-     * Get the event editable attribute.
+     * Get the appointment editable attribute.
      */
     public function getIsEditableAttribute(): string
     {
@@ -73,34 +68,34 @@ class Event extends Model
     }
 
     /**
-     * Determine if the event is completed.
+     * Determine if the appointment is completed.
      */
     public function isCompleted(): bool
     {
-        return $this->outcome == 'completed';
+        return $this->status == 'completed';
     }
 
     /**
-     * Determine if the event is canceled.
+     * Determine if the appointment is canceled.
      */
     public function isCanceled(): bool
     {
-        return $this->outcome == 'canceled';
+        return $this->status == 'canceled';
     }
 
     /**
-     * Determine if the event is missed.
+     * Determine if the appointment is missed.
      */
     public function isMissed(): bool
     {
-        return $this->outcome == 'missed';
+        return $this->status == 'missed';
     }
 
     /**
-     * Determine if the event is pending.
+     * Determine if the appointment is pending.
      */
     public function isPending(): bool
     {
-        return $this->outcome == 'pending';
+        return $this->status == 'pending';
     }
 }

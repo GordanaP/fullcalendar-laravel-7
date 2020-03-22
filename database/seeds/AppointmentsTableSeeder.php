@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Seeder;
 
-class EventsTableSeeder extends Seeder
+class AppointmentsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -11,6 +11,6 @@ class EventsTableSeeder extends Seeder
      */
     public function run()
     {
-        factory('App\Event', 5)->create();
+        factory('App\Appointment', 5)->create();
     }
 }

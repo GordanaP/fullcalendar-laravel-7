@@ -22,33 +22,36 @@
         </div>
     </div>
 
-    @include('partials.events._modal')
+    @include('partials.appointments._modal')
 @endsection
 
 @section('scripts')
     <script>
 
-        var eventModal = $('#eventSaveModal');
-        var eventForm = $('#eventSaveForm');
-        var eventTitle = $('#eventTitle');
-        var eventDate = $('#eventDate');
-        var eventTime = $('#eventTime');
-        var eventSaveBtn = $('.event-save-btn');
-        var eventDeleteBtn = $('#eventDeleteBtn').hide();
-        var eventOutcomeRadio = $('input:radio[name=outcome]');
-        var eventOutcomeDiv = $('#eventOutcomeDiv').hide();
-        var hiddenElems = ['#eventDeleteBtn', '#eventOutcomeDiv'];
+        var appModal = $('#appSaveModal');
+        var appModalTitle = $('.modal-title');
+        var appTitle = $('#appTitle');
+        var appForm = $('#appSaveForm');
+        var appDate = $('#appDate');
+        var appTime = $('#appTime');
+        var appSaveBtn = $('.app-save-btn');
+        var appDeleteBtn = $('#appDeleteBtn').hide();
+        var appStatusRadio = $("input:radio[name=app_status]");
+        var appStatusDiv = $('#appStatusDiv').hide();
+        var hiddenElems = ['#appDeleteBtn', '#appStatusDiv'];
 
-        eventModal.clearContentOnClose(hiddenElems);
+        appModal.clearContentOnClose(hiddenElems);
 
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
-            var eventsListUrl = @json(route('events.list'));
+            var appListUrl = @json(route('appointments.list'));
             var firstWeekDay = 1;
             var eventLimit = 6;
             var dateFormat = "YYYY-MM-DD";
             var timeFormat = "HH:mm";
 
+            var businessOpen = @json(App::make('business-schedule')->theEarliestOpen());
+            var businessClose = @json(App::make('business-schedule')->theLatestClose());
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: [ 'interaction', 'dayGrid', 'timeGrid', 'list' ],
                 header: {
@@ -58,6 +61,8 @@
                 },
                 navLinks: true,
                 firstDay: firstWeekDay,
+                minTime: businessOpen,
+                maxTime: businessClose,
                 slotLabelFormat: [
                     {
                         hour: 'numeric',
@@ -67,7 +72,7 @@
                 ],
                 eventSources: [{
                     id: 'jsonFeedUrl',
-                    url: eventsListUrl,
+                    url: appListUrl,
                 }],
                 eventSourceSuccess: function(response, xhr) {
                     return response.data;
@@ -89,13 +94,14 @@
                 select: function(info) {
                     var selectedStart = info.start;
                     var selectedDate = formatDate(selectedStart, dateFormat);
-                    var selectedTime = formatDate(selectedStart, timeFormat);
+                    var selectedTime = viewDependentEventTime(info, businessOpen)
 
-                    eventModal.modal('show');
-                    eventTitle.val();
-                    eventDate.val(selectedDate);
-                    eventTime.val(selectedTime);
-                    eventSaveBtn.attr('id', 'eventStoreBtn').text('Save');
+                    appModal.open();
+                    appModalTitle.text('Schedule Appointment');
+                    appTitle.val();
+                    appDate.val(selectedDate);
+                    appTime.val(selectedTime);
+                    appSaveBtn.attr('id', 'appStoreBtn').text('Schedule');
                 },
                 eventClick: function(info) {
                     var clicked = info.event;
@@ -104,18 +110,21 @@
                     var clickedStart = clicked.start;
                     var clickedDate = formatDate(clickedStart, dateFormat);
                     var clickedTime = formatDate(clickedStart, timeFormat);
-                    var clickedOutcome = clicked.extendedProps.outcome;
-                    var eventSaveBtnText =  isPast(clickedStart) ? 'Submit' : 'Save changes';
+                    var clickedStatus = clicked.extendedProps.status;
+                    var appSaveBtnText =  isPast(clickedStart) ? 'Submit' : 'Reschedule';
+                    var appModalTitleText =  isPast(clickedStart)
+                        ? 'Mark Appointment Status' : 'Reschedule Appointment';
 
-                    eventModal.open();
-                    eventTitle.val(clickedTitle);
-                    eventDate.val(clickedDate);
-                    eventTime.val(clickedTime);
-                    checkRadioOption(eventOutcomeRadio, clickedOutcome)
-                    eventSaveBtn.attr('id', 'eventUpdateBtn')
-                        .text(eventSaveBtnText).val(clickedId);
+                    appModal.open();
+                    appModalTitle.text(appModalTitleText);
+                    appTitle.val(clickedTitle);
+                    appDate.val(clickedDate);
+                    appTime.val(clickedTime);
+                    checkRadioOption(appStatusRadio, clickedStatus)
+                    appSaveBtn.attr('id', 'appUpdateBtn')
+                        .text(appSaveBtnText).val(clickedId);
 
-                    toggleEventRelatedHiddenElems(clicked, eventDeleteBtn, eventOutcomeDiv);
+                    toggleEventRelatedHiddenElems(clicked, appDeleteBtn, appStatusDiv);
                 },
                 eventDrop:function(info) {
                     var dropped = info.event;
@@ -123,15 +132,15 @@
                     var droppedStart = dropped.start;
                     var droppedDate = formatDate(droppedStart, dateFormat);
                     var droppedTime = formatDate(droppedStart, timeFormat);
-                    var eventUpdateUrl = '/events/' + droppedId;
+                    var appUpdateUrl = '/appointments/' + droppedId;
 
                     var droppedData = {
-                        event_date: droppedDate,
-                        event_time: droppedTime,
+                        app_date: droppedDate,
+                        app_time: droppedTime,
                     }
 
                     $.ajax({
-                        url: eventUpdateUrl,
+                        url: appUpdateUrl,
                         type: 'PUT',
                         data: droppedData,
                     })
@@ -150,20 +159,20 @@
 
             calendar.render();
 
-            // Add event
-            $(document).on('click', '#eventStoreBtn', function(){
-                var fields = '#eventTitle, #eventDate, #eventTime';
-                var eventData = eventForm.find(fields).serializeArray();
-                var eventStoreUrl = @json(route('events.store'));
+            // Add appointment
+            $(document).on('click', '#appStoreBtn', function(){
+                var fields = '#appTitle, #appDate, #appTime';
+                var appData = appForm.find(fields).serializeArray();
+                var appStoreUrl = @json(route('appointments.store'));
 
                 $.ajax({
-                    url: eventStoreUrl,
+                    url: appStoreUrl,
                     type: 'POST',
-                    data: eventData,
+                    data: appData,
                 })
                 .done(function(response) {
-                    addCalendarEvent(response.event, calendar)
-                    eventModal.modal('hide');
+                    addCalendarEvent(response.appointment, calendar)
+                    appModal.close();
                 })
                 .fail(function() {
                     console.log("error");
@@ -171,41 +180,41 @@
             });
 
             // Update event
-            $(document).on('click', '#eventUpdateBtn', function(){
-                var eventId = $(this).val();
-                var date = eventDate.val();
-                var time = eventTime.val();
-                var eventStart = date + ' ' + time;
-                var fields = isPast(eventStart) ? 'input[name="outcome"]' : '#eventDate, #eventTime';
-                var eventData = eventForm.find(fields).serializeArray();
-                var eventUpdateUrl = '/events/'+eventId;
+            $(document).on('click', '#appUpdateBtn', function(){
+                var appId = $(this).val();
+                var date = appDate.val();
+                var time = appTime.val();
+                var appStart = date + ' ' + time;
+                var fields = isPast(appStart) ? 'input[name="app_status"]' : '#appDate, #appTime';
+                var appData = appForm.find(fields).serializeArray();
+                var appUpdateUrl = '/appointments/'+appId;
 
                 $.ajax({
-                    url: eventUpdateUrl,
+                    url: appUpdateUrl,
                     type: 'PUT',
-                    data: eventData,
+                    data: appData,
                 })
                 .done(function(response) {
-                    updateCalendarEvent(response.event, calendar);
-                    eventModal.modal('hide');
+                    updateCalendarEvent(response.appointment, calendar);
+                    appModal.close();
                 })
                 .fail(function() {
                     console.log("error");
                 });
             });
 
-            // Delete event
-            $(document).on('click', '#eventDeleteBtn', function() {
-                var eventId = $(this).val();
-                var eventDeleteUrl = '/events/'+ eventId;
+            // Delete appointment
+            $(document).on('click', '#appDeleteBtn', function() {
+                var appId = $(this).val();
+                var appDeleteUrl = '/appointments/'+ appId;
 
                 $.ajax({
-                    url: eventDeleteUrl,
+                    url: appDeleteUrl,
                     type: 'DELETE',
                 })
                 .done(function(response) {
-                    removeCalendarEvent(eventId, calendar);
-                    eventModal.modal('hide');
+                    removeCalendarEvent(appId, calendar);
+                    appModal.close();
                 })
                 .fail(function() {
                     console.log("error");

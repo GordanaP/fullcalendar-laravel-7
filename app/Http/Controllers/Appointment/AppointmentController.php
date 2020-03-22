@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Event;
+namespace App\Http\Controllers\Appointment;
 
-use App\Event;
+use App\Appointment;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class EventController extends Controller
+class AppointmentController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -36,24 +36,24 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        $event = Event::create([
-            'title' => $request->event_title,
-            'start_at' => $request->event_date . ' '. $request->event_time,
-            'outcome' => 'pending',
+        $appointment = Appointment::create([
+            'title' => $request->app_title,
+            'start_at' => $request->app_date . ' '. $request->app_time,
+            'status' => 'pending',
         ]);
 
         return response([
-            'event' => $event
+            'appointment' => $appointment
         ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Event  $event
+     * @param  \App\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function show(Event $event)
+    public function show(Appointment $appointment)
     {
         //
     }
@@ -61,10 +61,10 @@ class EventController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Event  $event
+     * @param  \App\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function edit(Event $event)
+    public function edit(Appointment $appointment)
     {
         //
     }
@@ -73,29 +73,29 @@ class EventController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Event  $event
+     * @param  \App\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Event $event)
+    public function update(Request $request, Appointment $appointment)
     {
-        $updated = $this->updated($event);
+        $updated = $this->updated($appointment);
 
         return response([
-            'event' => $updated
+            'appointment' => $updated
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Event  $event
+     * @param  \App\Appointment  $appointment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Event $event)
+    public function destroy(Appointment $appointment)
     {
-        if(! $event->start_at->isPast())
+        if(! $appointment->start_at->isPast())
         {
-            $event->delete();
+            $appointment->delete();
         }
 
         return response([
@@ -103,16 +103,17 @@ class EventController extends Controller
         ]);
     }
 
-    public function updated($event)
+    private function updated($appointment)
     {
-        if($event->start_at->isPast()) {
-            return tap($event)->update([
-                'outcome' => request('outcome'),
+        if($appointment->start_at->isPast()) {
+            return tap($appointment)->update([
+                'status' => request('app_status'),
             ]);
         } else {
-            return tap($event)->update([
-                'start_at' => request('event_date') . ' '. request('event_time'),
+            return tap($appointment)->update([
+                'start_at' => request('app_date') . ' '. request('app_time'),
             ]);
         }
     }
 }
+

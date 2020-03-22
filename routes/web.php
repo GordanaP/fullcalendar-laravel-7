@@ -12,11 +12,11 @@ Route::get('/', function () {
 Auth::routes();
 
 /**
- * Event
+ * Appointment
  */
-Route::get('/events/list', 'Event\EventAjaxController@index')
-    ->name('events.list');
-Route::resource('events', 'Event\EventController');
+Route::get('/appointments/list', 'Appointment\AppointmentAjaxController@index')
+    ->name('appointments.list');
+Route::resource('appointments', 'Appointment\AppointmentController');
 
 /**
  * Home
