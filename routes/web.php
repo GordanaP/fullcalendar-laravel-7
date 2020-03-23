@@ -19,6 +19,12 @@ Route::get('/appointments/list', 'Appointment\AppointmentAjaxController@index')
 Route::resource('appointments', 'Appointment\AppointmentController');
 
 /**
+ * DoctorAppointment
+ */
+Route::resource('doctors.appointments', 'Doctor\DoctorAppointmentController');
+
+
+/**
  * Home
  */
 Route::get('/home', 'HomeController@index')->name('home');

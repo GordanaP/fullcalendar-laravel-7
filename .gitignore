@@ -3,6 +3,7 @@
 /public/storage
 /storage/*.key
 /vendor
+/vnotes
 .env
 .env.backup
 .phpunit.result.cache

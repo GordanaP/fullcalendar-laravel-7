@@ -9,9 +9,7 @@
 @endsection
 
 @section('content')
-    @php
-        $doctor = App\Doctor::first();
-    @endphp
+
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -21,9 +19,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <a href="{{ route('doctors.appointments.index', App\Doctor::first()) }}">
-                {{ App\Doctor::first()->full_name }}
-            </a>
+
         </div>
     </div>
 
@@ -66,10 +62,6 @@
         appModal.clearContentOnClose(hiddenElems);
 
         document.addEventListener('DOMContentLoaded', function() {
-
-            /**
-             * Calendar
-             */
             var calendarEl = document.getElementById('calendar');
             var firstWeekDay = 1;
             var eventLimit = 6;
@@ -114,6 +106,7 @@
                     highlightHolidays(info);
                 },
                 selectable: true,
+                selectConstraint: 'businessHours',
                 selectAllow: function(info) {
                     return isSelectable(info.start);
                 },
@@ -121,7 +114,7 @@
                 select: function(info) {
                     var selectedStart = info.start;
                     var selectedDate = formatDate(selectedStart, dateFormat);
-                    var selectedTime = viewDependentEventTime(info, businessOpen)
+                    var selectedTime = formatDate(selectedStart, timeFormat);
 
                     appModal.open();
                     appModalTitle.text('Schedule Appointment');
