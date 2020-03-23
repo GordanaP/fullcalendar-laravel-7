@@ -21,6 +21,8 @@ Route::resource('appointments', 'Appointment\AppointmentController');
 /**
  * DoctorAppointment
  */
+Route::get('doctors/{doctor}/appointments/list', 'Doctor\DoctorAppointmentAjaxController@index')
+    ->name('doctors.appointments.list');
 Route::resource('doctors.appointments', 'Doctor\DoctorAppointmentController');
 
 

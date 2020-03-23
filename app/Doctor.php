@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Doctor extends Model
@@ -39,5 +40,13 @@ class Doctor extends Model
         return $this->belongsToMany(BusinessDay::class)
             ->as('hour')
             ->withPivot('start_at', 'end_at');
+    }
+
+    /**
+     * The doctor's appointments.
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
     }
 }

@@ -11,6 +11,7 @@
 @section('content')
 
     <div class="row">
+
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
@@ -33,6 +34,7 @@
          * Appointment
          */
         var appListUrl = @json(route('appointments.list'));
+        var drAppListUrl = @json(route('doctors.appointments.list', $doctor));
         var appModal = $('#appSaveModal');
         var appModalTitle = $('.modal-title');
         var appTitle = $('#appTitle');
@@ -90,7 +92,7 @@
                 ],
                 eventSources: [{
                     id: 'jsonFeedUrl',
-                    url: appListUrl,
+                    url: drAppListUrl,
                 }],
                 eventSourceSuccess: function(response, xhr) {
                     return response.data;
@@ -189,14 +191,15 @@
             $(document).on('click', '#appStoreBtn', function(){
                 var fields = '#appTitle, #appDate, #appTime';
                 var appData = appForm.find(fields).serializeArray();
-                var appStoreUrl = @json(route('appointments.store'));
+                var scheduleAppUrl = @json(route('doctors.appointments.store', $doctor));
 
                 $.ajax({
-                    url: appStoreUrl,
+                    url: scheduleAppUrl,
                     type: 'POST',
                     data: appData,
                 })
                 .done(function(response) {
+                    console.log(response)
                     addCalendarEvent(response.appointment, calendar)
                     appModal.close();
                 })

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Doctor;
 
 use App\Doctor;
+use App\Appointment;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 
 class DoctorAppointmentController extends Controller
@@ -33,11 +35,18 @@ class DoctorAppointmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Doctor $doctor): Response
     {
-        //
+        $appointment = $doctor->appointments()->create([
+            'title' => $request->app_title,
+            'start_at' => $request->app_date . ' ' . $request->app_time,
+            'status' => 'pending',
+        ]);
+
+        return response([
+            'appointment' => $appointment
+        ]);
     }
 
     /**

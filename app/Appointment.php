@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Appointment extends Model
 {
@@ -38,7 +39,9 @@ class Appointment extends Model
      */
     public function getEndAtAttribute(): string
     {
-        return $this->start_at->addMinutes(30)->toDateTimeString();
+        $app_slot = $this->doctor->app_slot;
+
+        return $this->start_at->addMinutes($app_slot)->toDateTimeString();
     }
 
     /**
@@ -53,7 +56,7 @@ class Appointment extends Model
         } else if ($this->isMissed()) {
             $color = '#cbd5e0';
         } else {
-            $color = '#90cdf4';
+            $color = $this->doctor->color;
         }
 
         return $color;
@@ -65,6 +68,14 @@ class Appointment extends Model
     public function getIsEditableAttribute(): string
     {
         return ! $this->start_at->isPast() ? true : false;
+    }
+
+    /**
+     * The appointment's doctor.
+     */
+    public function doctor(): BelongsTo
+    {
+        return $this->belongsTo(Doctor::class);
     }
 
     /**
