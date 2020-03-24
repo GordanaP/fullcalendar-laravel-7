@@ -8,9 +8,27 @@ use App\Appointment;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Repositories\AppointmentRepository;
 
 class DoctorPatientAppointmentController extends Controller
 {
+    /**
+     * The appointments.
+     *
+     * @var \App\Repositories\AppointmentRepository
+     */
+    private $appointments;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param \App\Repositories\AppointmentRepository $appointments
+     */
+    public function __construct(AppointmentRepository $appointments)
+    {
+        $this->appointments = $appointments;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -23,6 +41,9 @@ class DoctorPatientAppointmentController extends Controller
 
     /**
      * Show the form for creating a new resource.
+     *
+     * @param App\Doctor $doctor
+     * @param App\Patient $patient
      */
     public function create(Doctor $doctor, Patient $patient): View
     {
@@ -33,24 +54,12 @@ class DoctorPatientAppointmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param App\Doctor $doctor
+     * @param App\Patient $patient
      */
     public function store(Request $request, Doctor $doctor, Patient $patient)
     {
-        $appointment = (new Appointment)->fill([
-            'start_at' => $request->app_date . ' ' . $request->app_time,
-            'status' => 'pending',
-        ]);
-
-        $appointment->patient()->associate($patient);
-
-        $doctor->appointments()->save($appointment);
-
-        // $appointment = $doctor->appointments()->create([
-        //     'patient_id' => $patient->id,
-        //     'start_at' => $request->app_date . ' ' . $request->app_time,
-        //     'status' => 'pending',
-        // ]);
+        $appointment = $this->appointments->schedule($request->all(), $patient);
 
         return response([
             'appointment' => $appointment

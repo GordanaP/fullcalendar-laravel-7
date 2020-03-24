@@ -3,11 +3,30 @@
 namespace App\Http\Controllers\Appointment;
 
 use App\Appointment;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use App\Http\Controllers\Controller;
+use App\Repositories\AppointmentRepository;
 
 class AppointmentController extends Controller
 {
+    /**
+     * The appointments.
+     *
+     * @var \App\Repositories\AppointmentRepository
+     */
+    private $appointments;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param \App\Repositories\AppointmentRepository $appointments
+     */
+    public function __construct(AppointmentRepository $appointments)
+    {
+        $this->appointments = $appointments;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -36,15 +55,7 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        $appointment = Appointment::create([
-            'title' => $request->app_title,
-            'start_at' => $request->app_date . ' '. $request->app_time,
-            'status' => 'pending',
-        ]);
-
-        return response([
-            'appointment' => $appointment
-        ]);
+        //
     }
 
     /**
@@ -74,11 +85,10 @@ class AppointmentController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Appointment  $appointment
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Appointment $appointment)
+    public function update(Request $request, Appointment $appointment): Response
     {
-        $updated = $this->updated($appointment);
+        $updated = $this->appointments->reschedule($appointment, $request->all());
 
         return response([
             'appointment' => $updated
@@ -89,30 +99,16 @@ class AppointmentController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Appointment  $appointment
-     * @return \Illuminate\Http\Response
      */
-    public function destroy(Appointment $appointment)
+    public function destroy(Appointment $appointment = null): Response
     {
         if(! $appointment->start_at->isPast())
         {
-            $appointment->delete();
+            $this->appointments->delete($appointment);
         }
 
         return response([
             'message' => 'Deleted'
         ]);
-    }
-
-    private function updated($appointment)
-    {
-        if($appointment->start_at->isPast()) {
-            return tap($appointment)->update([
-                'status' => request('app_status'),
-            ]);
-        } else {
-            return tap($appointment)->update([
-                'start_at' => request('app_date') . ' '. request('app_time'),
-            ]);
-        }
     }
 }

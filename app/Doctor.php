@@ -67,4 +67,24 @@ class Doctor extends Model
     {
         return $this->hasMany(Patient::class);
     }
+
+    /**
+     * Add new patient.
+     *
+     * @param array $data
+     */
+    public function addPatient($data): Patient
+    {
+        return $this->patients()->create($data);
+    }
+
+    /**
+     * Add new appointment.
+     *
+     * @param \App\Appointment $appointment
+     */
+    public function addAppointment($appointment): Appointment
+    {
+        return $this->appointments()->save($appointment);
+    }
 }

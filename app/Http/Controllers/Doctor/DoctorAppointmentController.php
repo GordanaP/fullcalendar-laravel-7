@@ -3,19 +3,35 @@
 namespace App\Http\Controllers\Doctor;
 
 use App\Doctor;
-use App\Patient;
-use App\Appointment;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Repositories\AppointmentRepository;
 
 class DoctorAppointmentController extends Controller
 {
     /**
+     * The appointments.
+     *
+     * @var \App\Repositories\AppointmentRepository
+     */
+    private $appointments;
+
+    /**
+     * Create a new class instance.
+     *
+     * @param \App\Repositories\AppointmentRepository $appointments
+     */
+    public function __construct(AppointmentRepository $appointments)
+    {
+        $this->appointments = $appointments;
+    }
+
+    /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param App\Doctor $doctor
      */
     public function index(Doctor $doctor): View
     {
@@ -39,24 +55,11 @@ class DoctorAppointmentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param App\Doctor $doctor
      */
-    public function store(Request $request, Doctor $doctor)
+    public function store(Request $request, Doctor $doctor): Response
     {
-
-        $patient = $doctor->patients()->create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'birthday' => $request->birthday,
-        ]);
-
-        $appointment = (new Appointment)->fill([
-            'start_at' => $request->app_date . ' ' . $request->app_time,
-            'status' => 'pending',
-        ]);
-
-        $appointment->patient()->associate($patient);
-
-        $doctor->appointments()->save($appointment);
+        $appointment = $this->appointments->schedule($request->all());
 
         return response([
             'appointment' => $appointment->load('patient')
