@@ -23,10 +23,12 @@ function updateCalendarEvent(event, calendar)
         var eventEnd = new Date(event.end_at);
         var eventColor = event.color;
         var eventStatus = event.status;
+        var eventPatient = event.patient;
 
         calendarEvent.setProp('backgroundColor', eventColor);
         calendarEvent.setProp('borderColor', eventColor);
         calendarEvent.setExtendedProp('status', eventStatus);
+        calendarEvent.setExtendedProp('patient', eventPatient);
         calendarEvent.setDates(eventStart, eventEnd);
     }
 }
@@ -60,6 +62,7 @@ function transformToEventObj(event) {
     event.borderColor = event.color;
     event.status = event.status;
     event.editable = event.is_editable;
+    event.patient = event.patient;
 
     return event;
 }

@@ -45,6 +45,8 @@
         var appStatusDiv = $('#appStatusDiv').hide();
         var hiddenElems = ['#appDeleteBtn', '#appStatusDiv'];
         var patientExists = @json($patient);
+        var patientDetails = $('#patientDetails');
+        var patientIdentifier = $('#patientIdentifier');
         var scheduleAppUrl = patientExists
             ?  @json(route('doctors.patients.appointments.store', [$doctor, $patient]))
             : @json(route('doctors.appointments.store', $doctor));
@@ -128,29 +130,36 @@
                     appModalTitle.text('Schedule Appointment');
                     appDate.val(selectedDate);
                     appTime.val(selectedTime);
+                    patientDetails.show();
+                    patientIdentifier.hide();
                     appSaveBtn.attr('id', 'appStoreBtn').text('Schedule');
                 },
                 eventClick: function(info) {
                     var clicked = info.event;
                     var clickedId = clicked.id;
-                    var clickedTitle = clicked.title;
                     var clickedStart = clicked.start;
                     var clickedDate = formatDate(clickedStart, dateFormat);
                     var clickedTime = formatDate(clickedStart, timeFormat);
                     var clickedStatus = clicked.extendedProps.status;
-                    var appSaveBtnText =  isPast(clickedStart) ? 'Submit' : 'Reschedule';
+                    var clickedPatient = clicked.extendedProps.patient;
                     var appModalTitleText =  isPast(clickedStart)
-                        ? 'Mark Appointment Status' : 'Reschedule Appointment';
+                        ? 'Mark Appointment Status'
+                        : 'Reschedule Appointment';
+                    var appSaveBtnText =  isPast(clickedStart) ? 'Submit' : 'Reschedule';
+                    var showAppUrl = '/appointments/'+clickedId;
 
                     appModal.open();
                     appModalTitle.text(appModalTitleText);
+                    patientDetails.hide();
+                    patientIdentifier.show().find('#patientName')
+                        .val(clickedPatient.last_name);
                     appDate.val(clickedDate);
                     appTime.val(clickedTime);
                     checkRadioOption(appStatusRadio, clickedStatus)
                     appSaveBtn.attr('id', 'appUpdateBtn')
                         .text(appSaveBtnText).val(clickedId);
-
                     toggleEventRelatedHiddenElems(clicked, appDeleteBtn, appStatusDiv);
+
                 },
                 eventDrop:function(info) {
                     var dropped = info.event;

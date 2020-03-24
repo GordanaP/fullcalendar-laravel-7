@@ -19,6 +19,7 @@ class AppointmentResource extends JsonResource
             'title' => $this->patient->last_name,
             'start' => $this->start_at,
             'end' => $this->end_at,
+            'patient' => $this->patient,
             'status' => $this->status,
             'backgroundColor' => $this->color,
             'borderColor' => $this->color,
