@@ -4,14 +4,14 @@
 
     <style>
         .holiday, .holiday span.ui-state-default { background-color: coral; }
+        .absence, .absence span.ui-state-default { background-color: yellow; }
+        .office-day a.ui-state-default {background-color: lightgreen}
     </style>
 
 @endsection
 
 @section('content')
-
     <div class="row">
-
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
@@ -33,7 +33,6 @@
         /**
          * Appointment
          */
-        var appListUrl = @json(route('appointments.list'));
         var drAppListUrl = @json(route('doctors.appointments.list', $doctor));
         var appModal = $('#appSaveModal');
         var appModalTitle = $('.modal-title');
@@ -46,6 +45,8 @@
         var appStatusRadio = $("input:radio[name=app_status]");
         var appStatusDiv = $('#appStatusDiv').hide();
         var hiddenElems = ['#appDeleteBtn', '#appStatusDiv'];
+
+        appModal.clearContentOnClose(hiddenElems);
 
         /**
          * Business schedule
@@ -60,9 +61,11 @@
         var drOfficeHours = @json(App::make('doctor-schedule')->setDoctor($doctor)->officeHours());
         var drSchedulingTimeSlot = @json($doctor->app_slot);
         var drSlotDuration = formatDateString(drSchedulingTimeSlot, 'mm', 'HH:mm:ss');
+        var drAbsences = @json(App::make('doctor-absences')->setDoctor($doctor)->all());
 
-        appModal.clearContentOnClose(hiddenElems);
-
+        /**
+         * Calendar
+         */
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
             var firstWeekDay = 1;
@@ -106,11 +109,11 @@
                 },
                 dayRender: function(info) {
                     highlightHolidays(info);
+                    highlightDoctorAbsences(info, drAbsences);
                 },
                 selectable: true,
-                selectConstraint: 'businessHours',
                 selectAllow: function(info) {
-                    return isSelectable(info.start);
+                    return isSelectable(info.start, drAbsences);
                 },
                 selectConstraint: 'businessHours',
                 select: function(info) {
@@ -175,7 +178,7 @@
                 },
                 eventOverlap: false,
                 eventAllow: function(dropInfo, draggedEvent) {
-                    return isSelectable(dropInfo.start)
+                    return isSelectable(dropInfo.start, drAbsences)
                 },
                 eventConstraint: 'businessHours',
                 views: {

@@ -21,11 +21,12 @@ function viewDependentEventTime(selectInfo, businessOpen)
  * @param  Javascript\Date  date
  * @return boolean
  */
-function isSelectable(date)
+function isSelectable(date, doctorAbsences)
 {
     return  ! isPast(date) &&
             ! isSunday(date) &&
-            ! isHoliday(date);
+            ! isHoliday(date) &&
+            ! isDoctorAbsenceDate(date, doctorAbsences);
 }
 
 /**

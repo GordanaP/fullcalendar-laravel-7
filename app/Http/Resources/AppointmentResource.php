@@ -20,8 +20,8 @@ class AppointmentResource extends JsonResource
             'start' => $this->start_at,
             'end' => $this->end_at,
             'status' => $this->status,
-            'backgroundColor' => $this->doctor->color,
-            'borderColor' => $this->doctor->color,
+            'backgroundColor' => $this->color,
+            'borderColor' => $this->color,
             'editable' => $this->is_editable,
         ];
     }

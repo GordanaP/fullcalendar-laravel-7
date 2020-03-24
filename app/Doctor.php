@@ -33,6 +33,16 @@ class Doctor extends Model
     }
 
     /**
+     * The doctors' absences.
+     */
+    public function absences(): BelongsToMany
+    {
+        return $this->belongsToMany(Absence::class)
+            ->as('day')
+            ->withPivot('start_at', 'duration');
+    }
+
+    /**
      * The doctors' business days.
      */
     public function business_days(): BelongsToMany

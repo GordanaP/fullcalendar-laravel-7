@@ -37,6 +37,7 @@
 <script src="{{ asset('js/fc_basic.js') }}"></script>
 <script src="{{ asset('js/fc_event.js') }}"></script>
 <script src="{{ asset('js/fc_holidays.js') }}"></script>
+<script src="{{ asset('js/fc_absences.js') }}"></script>
 <script src="{{ asset('js/modal_helpers.js') }}"></script>
 <script src="{{ asset('js/form_helpers.js') }}"></script>
 
