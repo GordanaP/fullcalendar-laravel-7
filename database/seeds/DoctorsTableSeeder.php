@@ -20,8 +20,8 @@ class DoctorsTableSeeder extends Seeder
                 'end_at' => '20:00'
             ],
             2 => [
-                'start_at' => '10:00',
-                'end_at' => '14:00'
+                'start_at' => '14:00',
+                'end_at' => '18:00'
             ],
             5 => [
                 'start_at' => '12:00',

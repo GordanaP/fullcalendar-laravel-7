@@ -1,9 +1,33 @@
 <form id="appSaveForm">
     <div class="form-group">
-        <label for="title">Title:</label>
-        <input type="text" name="app_title" id="appTitle"
-        class="form-control" placeholder="Appointment title">
+        <label for="doctor">Doctor:</label>
+        <input type="text" class="form-control" id="doctor"
+        value="{{ $doctor->full_name }}" disabled>
     </div>
+
+    @if (! $patient)
+        <div class="form-group">
+            <label for="firstName">Patient First Name:</label>
+            <input type="text" class="form-control" placeholder="Patient first name"
+            name="first_name" id="firstName">
+        </div>
+        <div class="form-group">
+            <label for="lastName">Patient Last Name:</label>
+            <input type="text" class="form-control" placeholder="Patient last name"
+            name="last_name" id="lastName">
+        </div>
+        <div class="form-group">
+            <label for="birthday">Patient Birthday:</label>
+            <input type="text" class="form-control" placeholder="yyyy-mm-dd"
+            name="birthday" id="birthday">
+        </div>
+    @else
+        <div class="form-group">
+            <label for="patient">Patient:</label>
+            <input type="text" class="form-control" id="patient"
+            value="{{ $patient->full_name }}" disabled>
+        </div>
+    @endif
 
     <div class="row">
         <div class="col-md-6">

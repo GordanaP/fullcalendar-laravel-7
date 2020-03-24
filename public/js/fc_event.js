@@ -53,7 +53,7 @@ function addCalendarEvent(event, calendar, eventSourceId = 'jsonFeedUrl')
  * @return FullCalendar\EventObj
  */
 function transformToEventObj(event) {
-    event.title = event.title;
+    event.title = event.patient.last_name;
     event.start = event.start_at;
     event.end = event.end_at;
     event.backgroundColor = event.color;

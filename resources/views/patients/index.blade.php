@@ -9,8 +9,7 @@
                 <td>{{ $patient->full_name }}</td>
                 <td>
                     {{ $patient->doctor->last_name }}
-                    <a href="{{ route('doctors.appointments.index',
-                        [$patient->doctor] + ['patient' => $patient->id]) }}">
+                    <a href="{{ route('doctors.patients.appointments.create', [$patient->doctor, $patient]) }}">
                         Schedule
                     </a>
                 </td>

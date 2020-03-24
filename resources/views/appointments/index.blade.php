@@ -11,7 +11,6 @@
 @endsection
 
 @section('content')
-    {{ App\Patient::find(request('patient')) ?? null}}
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -37,7 +36,6 @@
         var drAppListUrl = @json(route('doctors.appointments.list', $doctor));
         var appModal = $('#appSaveModal');
         var appModalTitle = $('.modal-title');
-        var appTitle = $('#appTitle');
         var appForm = $('#appSaveForm');
         var appDate = $('#appDate');
         var appTime = $('#appTime');
@@ -46,6 +44,10 @@
         var appStatusRadio = $("input:radio[name=app_status]");
         var appStatusDiv = $('#appStatusDiv').hide();
         var hiddenElems = ['#appDeleteBtn', '#appStatusDiv'];
+        var patientExists = @json($patient);
+        var scheduleAppUrl = patientExists
+            ?  @json(route('doctors.patients.appointments.store', [$doctor, $patient]))
+            : @json(route('doctors.appointments.store', $doctor));
 
         appModal.clearContentOnClose(hiddenElems);
 
@@ -124,7 +126,6 @@
 
                     appModal.open();
                     appModalTitle.text('Schedule Appointment');
-                    appTitle.val();
                     appDate.val(selectedDate);
                     appTime.val(selectedTime);
                     appSaveBtn.attr('id', 'appStoreBtn').text('Schedule');
@@ -143,7 +144,6 @@
 
                     appModal.open();
                     appModalTitle.text(appModalTitleText);
-                    appTitle.val(clickedTitle);
                     appDate.val(clickedDate);
                     appTime.val(clickedTime);
                     checkRadioOption(appStatusRadio, clickedStatus)
@@ -193,9 +193,10 @@
 
             // Add appointment
             $(document).on('click', '#appStoreBtn', function(){
-                var fields = '#appTitle, #appDate, #appTime';
+                var fields = patientExists
+                    ? '#appDate, #appTime'
+                    : '#firstName, #lastName, #birthday, #appDate, #appTime';
                 var appData = appForm.find(fields).serializeArray();
-                var scheduleAppUrl = @json(route('doctors.appointments.store', $doctor));
 
                 $.ajax({
                     url: scheduleAppUrl,

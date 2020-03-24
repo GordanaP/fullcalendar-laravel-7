@@ -7,48 +7,36 @@ use App\Patient;
 use App\Appointment;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 
-class DoctorAppointmentController extends Controller
+class DoctorPatientAppointmentController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Doctor $doctor): View
+    public function index()
     {
-        return view('appointments.index')->with([
-            'doctor' => $doctor,
-            'patient' => ''
-        ]);
+        //
     }
 
     /**
      * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Doctor $doctor, Patient $patient): View
     {
-        //
+        return view('appointments.index', compact('doctor', 'patient'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    public function store(Request $request, Doctor $doctor)
+    public function store(Request $request, Doctor $doctor, Patient $patient)
     {
-
-        $patient = $doctor->patients()->create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'birthday' => $request->birthday,
-        ]);
-
         $appointment = (new Appointment)->fill([
             'start_at' => $request->app_date . ' ' . $request->app_time,
             'status' => 'pending',
@@ -58,8 +46,14 @@ class DoctorAppointmentController extends Controller
 
         $doctor->appointments()->save($appointment);
 
+        // $appointment = $doctor->appointments()->create([
+        //     'patient_id' => $patient->id,
+        //     'start_at' => $request->app_date . ' ' . $request->app_time,
+        //     'status' => 'pending',
+        // ]);
+
         return response([
-            'appointment' => $appointment->load('patient')
+            'appointment' => $appointment
         ]);
     }
 

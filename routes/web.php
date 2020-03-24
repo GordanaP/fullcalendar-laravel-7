@@ -26,6 +26,11 @@ Route::get('doctors/{doctor}/appointments/list', 'Doctor\DoctorAppointmentAjaxCo
 Route::resource('doctors.appointments', 'Doctor\DoctorAppointmentController');
 
 /**
+ * DoctorPatientAppointment
+ */
+Route::resource('doctors.patients.appointments', 'Doctor\DoctorPatientAppointmentController');
+
+/**
  * Patient
  */
 Route::resource('patients', 'Patient\PatientController');
