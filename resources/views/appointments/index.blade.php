@@ -11,6 +11,7 @@
 @endsection
 
 @section('content')
+    {{ App\Patient::find(request('patient')) ?? null}}
     <div class="row">
         <div class="col-md-8">
             <div class="card">

@@ -78,6 +78,15 @@ class Appointment extends Model
         return $this->belongsTo(Doctor::class);
     }
 
+
+    /**
+     * The appointment's patient.
+     */
+    public function patient(): BelongsTo
+    {
+        return $this->belongsTo(Patient::class);
+    }
+
     /**
      * Determine if the appointment is completed.
      */
