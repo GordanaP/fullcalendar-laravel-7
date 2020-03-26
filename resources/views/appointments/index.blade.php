@@ -316,6 +316,7 @@
                 minDate: 0,
                 changeMonth: true,
                 changeYear: true,
+                yearRaange: "c-10:c+10",
                 beforeShowDay: function(date) {
                     return markDoctorOfficeDays(date, drOfficeDays, drAbsences);
                 },
