@@ -1,12 +1,11 @@
 /**
- * Check the radio button.
+ * Check the radio option value.
  *
- * @param  JQuery\Object radio
- * @param  string optionValue
+ * @param  string value
  */
-function checkRadioOption(radio, optionValue)
+$.fn.checkOptionValue = function(value)
 {
-    radio.filter('[value='+optionValue+']').prop('checked', true);
+    return $(this).filter('[value='+value+']').prop('checked', true);
 }
 
 /**
@@ -14,7 +13,7 @@ function checkRadioOption(radio, optionValue)
  */
 function clearErrorOnTriggeringAnEvent()
 {
-    $("input, textarea").on('keydown', function () {
+    $("input, textarea").on('focus', function () {
          clearError($(this).attr('name'));
     });
 

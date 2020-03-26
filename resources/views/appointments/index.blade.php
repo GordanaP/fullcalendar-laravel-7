@@ -11,7 +11,6 @@
 @endsection
 
 @section('content')
-
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -48,14 +47,24 @@
         var patientExists = @json($patient);
         var patientDetails = $('#patientDetails');
         var patientIdentifier = $('#patientIdentifier');
-        var scheduleAppUrl = patientExists
-            ?  @json(route('doctors.patients.appointments.store', [$doctor, $patient]))
-            :  @json(route('doctors.appointments.store', $doctor));
+        var dateTimeInputs = '#appDate, #appTime';
+        var patientInputs = '#firstName, #lastName, #birthday';
+        var appStatusInput = 'input:radio[name=app_status]';
+
+        if(patientExists) {
+            var scheduleAppUrl =  @json(route('doctors.patients.appointments.store', [$doctor, $patient]));
+            var scheduleAppFormFields = dateTimeInputs;
+        } else {
+            var scheduleAppUrl = @json(route('doctors.appointments.store', $doctor));
+            var scheduleAppFormFields = dateTimeInputs.concat(', ').concat(patientInputs);
+        }
+
         var errors = [
             'first_name', 'last_name', 'birthday' , 'app_date', 'app_time', 'app_status'
         ];
 
         appModal.clearContentOnClose(errors, hiddenElems);
+        clearErrorOnTriggeringAnEvent();
 
         /**
          * Business schedule
@@ -67,7 +76,8 @@
          * Doctor schedule
          */
         var drOfficeDays = @json($doctor->business_days);
-        var drOfficeHours = @json(App::make('doctor-schedule')->setDoctor($doctor)->officeHours());
+        var drOfficeHours = @json(App::make('doctor-schedule')
+            ->setDoctor($doctor)->officeHours());
         var drSchedulingTimeSlot = @json($doctor->app_slot);
         var drSlotDuration = formatDateString(drSchedulingTimeSlot, 'mm', 'HH:mm:ss');
         var drAbsences = @json(App::make('doctor-absences')->setDoctor($doctor)->all());
@@ -121,7 +131,8 @@
                 },
                 selectable: true,
                 selectAllow: function(info) {
-                    return isSelectable(info.start, drAbsences);
+                    var selectedStart = info.start;
+                    return isSelectable(selectedStart, drAbsences);
                 },
                 selectConstraint: 'businessHours',
                 select: function(info) {
@@ -164,22 +175,40 @@
                     var clickedStatus = clicked.extendedProps.status;
                     var clickedPatient = clicked.extendedProps.patient;
                     var appModalTitleText =  isPast(clickedStart)
-                        ? 'Mark Appointment Status'
-                        : 'Reschedule Appointment';
-                    var appSaveBtnText =  isPast(clickedStart) ? 'Submit' : 'Reschedule';
-                    var showAppUrl = '/appointments/'+clickedId;
+                        ? 'Mark Appointment Status' : 'Reschedule Appointment';
+                    var appSaveBtnText =  isPast(clickedStart)
+                        ? 'Submit' : 'Reschedule';
+                    var disabledStatus = isPast(clickedStart) ? true : false;
 
                     appModal.open();
                     appModalTitle.text(appModalTitleText);
                     patientDetails.hide();
                     patientIdentifier.show().find('#patientName')
                         .val(clickedPatient.last_name);
-                    appDate.val(clickedDate);
-                    appTime.val(clickedTime);
-                    checkRadioOption(appStatusRadio, clickedStatus)
+                    appDate.val(clickedDate).prop('disabled', disabledStatus);
+                    appTime.val(clickedTime).prop('disabled', disabledStatus);
+                    appStatusRadio.checkOptionValue(clickedStatus);
                     appSaveBtn.attr('id', 'appUpdateBtn')
                         .text(appSaveBtnText).val(clickedId);
                     toggleEventRelatedHiddenElems(clicked, appDeleteBtn, appStatusDiv);
+
+                    $.ajax({
+                        url: drSchedulingTimeSlotsUrl,
+                        type: 'POST',
+                        data: {
+                            app_date: clickedDate
+                        },
+                    })
+                    .done(function(response) {
+                        appTime.timepicker('remove');
+                        appTime.timepicker({
+                            'timeFormat': 'H:i',
+                            'step': drSchedulingTimeSlot,
+                            'minTime': response.minTime,
+                            'maxTime': response.maxTime,
+                            'disableTimeRanges': response.bookedSlots,
+                        });
+                    });
                 },
                 eventDrop:function(info) {
                     var dropped = info.event;
@@ -205,7 +234,8 @@
                 },
                 eventOverlap: false,
                 eventAllow: function(dropInfo, draggedEvent) {
-                    return isSelectable(dropInfo.start, drAbsences)
+                    var droppedStart = dropInfo.start;
+                    return isSelectable(droppedStart, drAbsences)
                 },
                 eventConstraint: 'businessHours',
                 views: {
@@ -219,10 +249,7 @@
 
             // Add appointment
             $(document).on('click', '#appStoreBtn', function(){
-                var fields = patientExists
-                    ? '#appDate, #appTime'
-                    : '#firstName, #lastName, #birthday, #appDate, #appTime';
-                var appData = appForm.find(fields).serializeArray();
+                var appData = appForm.find(scheduleAppFormFields).serializeArray();
 
                 $.ajax({
                     url: scheduleAppUrl,
@@ -245,7 +272,7 @@
                 var date = appDate.val();
                 var time = appTime.val();
                 var appStart = dateTimeString(date, time);
-                var fields = isPast(appStart) ? 'input[name="app_status"]' : '#appDate, #appTime';
+                var fields = isPast(appStart) ? appStatusInput : dateTimeInputs;
                 var appData = appForm.find(fields).serializeArray();
                 var appUpdateUrl = '/appointments/'+appId;
 
@@ -293,9 +320,8 @@
                     return markDoctorOfficeDays(date, drOfficeDays, drAbsences);
                 },
                 onSelect: function(date) {
-
                     appTime.timepicker('remove');
-                    appTime.val('')
+                    // appTime.val('')
 
                     $.ajax({
                         url: drSchedulingTimeSlotsUrl,

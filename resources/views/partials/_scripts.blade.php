@@ -28,7 +28,8 @@
 <script src="{{ asset('vendor/fullcalendar-4.3.1/packages/list/main.js') }}"></script>
 
 <!-- Datepicker -->
-<script src="{{ asset('vendor/jquery-ui-1.12.1.purple/jquery-ui.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="{{ asset('vendor/jquery-ui-1.12.1.purple/jquery-ui.min.js') }}"></script>
 
 <!-- Timepicker -->
 <script src="{{ asset('vendor/jonthornton-jquery-timepicker/jquery.timepicker.js') }}"></script>
