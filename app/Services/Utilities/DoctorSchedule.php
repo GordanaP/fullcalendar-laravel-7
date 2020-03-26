@@ -81,9 +81,12 @@ class DoctorSchedule extends AppCarbon
      */
     function timepickerDisableTimeRanges($date): Collection
     {
-        return $this->bookedTimeSlots($date)->map(function($slot){
+        // $carbon = App::make('app-carbon');
+        // $doctor = $this->doctor;
+
+        return $this->bookedTimeSlots($date)->map(function($slot) {
             return [
-                $this->parse($slot)->addMinutes($this->doctor->app_slot)->format('H:i')
+                $slot, $this->parse($slot)->addMinutes($this->doctor->app_slot)->format('H:i')
             ];
         });
     }

@@ -11,6 +11,7 @@
 @endsection
 
 @section('content')
+
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -70,6 +71,7 @@
         var drSchedulingTimeSlot = @json($doctor->app_slot);
         var drSlotDuration = formatDateString(drSchedulingTimeSlot, 'mm', 'HH:mm:ss');
         var drAbsences = @json(App::make('doctor-absences')->setDoctor($doctor)->all());
+        var drSchedulingTimeSlotsUrl = @json(route('doctors.scheduling.time.slots', $doctor));
 
         /**
          * Calendar
@@ -94,13 +96,11 @@
                 maxTime: businessClose,
                 businessHours: drOfficeHours,
                 slotDuration: drSlotDuration,
-                slotLabelFormat: [
-                    {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: false
-                    }
-                ],
+                slotLabelFormat: [{
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: false
+                }],
                 eventSources: [{
                     id: 'jsonFeedUrl',
                     url: drAppListUrl,
@@ -136,6 +136,24 @@
                     patientDetails.show();
                     patientIdentifier.hide();
                     appSaveBtn.attr('id', 'appStoreBtn').text('Schedule');
+
+                    $.ajax({
+                        url: drSchedulingTimeSlotsUrl,
+                        type: 'POST',
+                        data: {
+                            app_date: selectedDate
+                        },
+                    })
+                    .done(function(response) {
+                        appTime.timepicker('remove');
+                        appTime.timepicker({
+                            'timeFormat': 'H:i',
+                            'step': drSchedulingTimeSlot,
+                            'minTime': response.minTime,
+                            'maxTime': response.maxTime,
+                            'disableTimeRanges': response.bookedSlots,
+                        });
+                    });
                 },
                 eventClick: function(info) {
                     var clicked = info.event;
@@ -183,9 +201,6 @@
                     })
                     .done(function(response) {
                         console.log("success");
-                    })
-                    .fail(function() {
-                        console.log("error");
                     });
                 },
                 eventOverlap: false,
@@ -265,6 +280,40 @@
                 .fail(function() {
                     console.log("error");
                 });
+            });
+
+            // Datepicker
+            appDate.datepicker({
+                firstDay: 1,
+                dateFormat: "yy-mm-dd",
+                minDate: 0,
+                changeMonth: true,
+                changeYear: true,
+                beforeShowDay: function(date) {
+                    return markDoctorOfficeDays(date, drOfficeDays, drAbsences);
+                },
+                onSelect: function(date) {
+
+                    appTime.timepicker('remove');
+                    appTime.val('')
+
+                    $.ajax({
+                        url: drSchedulingTimeSlotsUrl,
+                        type: 'POST',
+                        data: {
+                            app_date: date
+                        },
+                    })
+                    .done(function(response) {
+                        appTime.timepicker({
+                            'timeFormat': 'H:i',
+                            'step': drSchedulingTimeSlot,
+                            'minTime': response.minTime,
+                            'maxTime': response.maxTime,
+                            'disableTimeRanges': response.bookedSlots,
+                        });
+                    });
+                },
             });
         });
 

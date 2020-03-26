@@ -33,6 +33,14 @@ Route::resource('doctors.appointments', 'Doctor\DoctorAppointmentController');
 Route::resource('doctors.patients.appointments', 'Doctor\DoctorPatientAppointmentController');
 
 /**
+ * DoctorSchedulingSlot
+ */
+Route::post('doctors/{doctor}/scheduling-time-slots',
+    'Doctor\DoctorSchedulingTimeSlotAjaxController@store')
+    ->name('doctors.scheduling.time.slots');
+
+
+/**
  * Patient
  */
 Route::resource('patients', 'Patient\PatientController');
