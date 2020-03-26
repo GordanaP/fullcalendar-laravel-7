@@ -9,6 +9,7 @@ use App\Rules\IsBusinessDay;
 use Illuminate\Validation\Rule;
 use App\Rules\IsDoctorOfficeDay;
 use App\Rules\IsDoctorOfficeHour;
+use App\Rules\IsLimitedMaximumAge;
 use Illuminate\Support\Facades\App;
 use App\Rules\IsNotDoctorAbsenceDay;
 use App\Rules\IsDoctorSchedulingSlot;
@@ -35,6 +36,8 @@ class AppointmentRequest extends FormRequest
      */
     public function rules()
     {
+        $doctor = $this->isMethod('post') ? $this->doctor : $this->appointment->doctor;
+
         $rules = [
             'first_name' => [
                 'filled', 'max:50'
@@ -44,23 +47,25 @@ class AppointmentRequest extends FormRequest
             ],
             'birthday' => [
                 'filled',
-            ],
-            'app_status' => [
-                Rule::in(['completed', 'canceled', 'missed'])
+                new isValidDate,
+                new IsLimitedMaximumAge,
             ],
             'app_date' => [
-                'sometimes', 'required',
+                'filled',
                 new isValidDate,
                 'after_or_equal:today',
             ],
             'app_time' => [
-                'sometimes', 'required', 'date_format:H:i',
+                'filled', 'date_format:H:i',
+            ],
+            'app_status' => [
+                Rule::in(['completed', 'canceled', 'missed'])
             ],
         ];
 
-        $rules = $this->addNew($rules, 'app_date', $this->dateRules($this->doctor, $this->app_date));
+        $rules = $this->addNew($rules, 'app_date', $this->dateRules($doctor, $this->app_date));
 
-        $rules = $this->addNew($rules, 'app_time', $this->timeRules($this->doctor, $this->app_date, $this->app_time));
+        $rules = $this->addNew($rules, 'app_time', $this->timeRules($doctor, $this->app_date, $this->app_time));
 
         return $rules;
     }

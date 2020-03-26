@@ -89,7 +89,7 @@ class AppointmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Appointment  $appointment
      */
-    public function update(Request $request, Appointment $appointment): Response
+    public function update(AppointmentRequest $request, Appointment $appointment)
     {
         $updated = $this->appointments->reschedule($appointment, $request->all());
 

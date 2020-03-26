@@ -11,7 +11,6 @@
 @endsection
 
 @section('content')
-
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -242,6 +241,7 @@
                     data: appData,
                 })
                 .done(function(response) {
+                    console.log(response);
                     updateCalendarEvent(response.appointment, calendar);
                     appModal.close();
                 })
