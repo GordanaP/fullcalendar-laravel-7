@@ -11,6 +11,7 @@
 @endsection
 
 @section('content')
+
     <div class="row">
         <div class="col-md-8">
             <div class="card">
@@ -49,9 +50,12 @@
         var patientIdentifier = $('#patientIdentifier');
         var scheduleAppUrl = patientExists
             ?  @json(route('doctors.patients.appointments.store', [$doctor, $patient]))
-            : @json(route('doctors.appointments.store', $doctor));
+            :  @json(route('doctors.appointments.store', $doctor));
+        var errors = [
+            'first_name', 'last_name', 'birthday' , 'app_date', 'app_time', 'app_status'
+        ];
 
-        appModal.clearContentOnClose(hiddenElems);
+        appModal.clearContentOnClose(errors, hiddenElems);
 
         /**
          * Business schedule
@@ -213,17 +217,17 @@
                     data: appData,
                 })
                 .done(function(response) {
-                    console.log(response)
                     addCalendarEvent(response.appointment, calendar)
                     appModal.close();
                 })
-                .fail(function() {
-                    console.log("error");
+                .fail(function(response) {
+                    var errors = response.responseJSON.errors;
+                    displayErrors(errors);
                 });
             });
 
             // Update appointment
-            $(document).on('click', '#appUpdateBtn', function(){
+            $(document).on('click', '#appUpdateBtn', function() {
                 var appId = $(this).val();
                 var date = appDate.val();
                 var time = appTime.val();
@@ -241,8 +245,9 @@
                     updateCalendarEvent(response.appointment, calendar);
                     appModal.close();
                 })
-                .fail(function() {
-                    console.log("error");
+                .fail(function(response) {
+                    var errors = response.responseJSON.errors;
+                    displayErrors(errors);
                 });
             });
 

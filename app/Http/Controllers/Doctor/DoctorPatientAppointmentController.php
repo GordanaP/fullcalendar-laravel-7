@@ -8,6 +8,7 @@ use App\Appointment;
 use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AppointmentRequest;
 use App\Repositories\AppointmentRepository;
 
 class DoctorPatientAppointmentController extends Controller
@@ -57,7 +58,7 @@ class DoctorPatientAppointmentController extends Controller
      * @param App\Doctor $doctor
      * @param App\Patient $patient
      */
-    public function store(Request $request, Doctor $doctor, Patient $patient)
+    public function store(AppointmentRequest $request, Doctor $doctor, Patient $patient)
     {
         $appointment = $this->appointments->schedule($request->all(), $patient);
 

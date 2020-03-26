@@ -6,6 +6,7 @@ use App\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AppointmentRequest;
 use App\Repositories\AppointmentRepository;
 
 class AppointmentController extends Controller

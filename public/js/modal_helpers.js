@@ -4,10 +4,11 @@
  * @param  array errors
  * @param  array hiddenElems
  */
-$.fn.clearContentOnClose = function(hiddenElems)
+$.fn.clearContentOnClose = function(errors, hiddenElems)
 {
     $(this).on("hidden.bs.modal", function() {
         $(this).clearFormContent();
+        $(this).clearAllErrors(errors);
         $(this).hideElements(hiddenElems, $(this));
     });
 }

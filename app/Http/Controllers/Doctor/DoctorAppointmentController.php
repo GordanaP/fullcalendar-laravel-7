@@ -7,6 +7,7 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AppointmentRequest;
 use App\Repositories\AppointmentRepository;
 
 class DoctorAppointmentController extends Controller
@@ -57,7 +58,7 @@ class DoctorAppointmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param App\Doctor $doctor
      */
-    public function store(Request $request, Doctor $doctor): Response
+    public function store(AppointmentRequest $request, Doctor $doctor): Response
     {
         $appointment = $this->appointments->schedule($request->all());
 

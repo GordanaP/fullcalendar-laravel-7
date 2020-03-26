@@ -6,6 +6,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::resource('tests', 'TestController')->only('index', 'store');
+
 /**
  * Auth
  */
