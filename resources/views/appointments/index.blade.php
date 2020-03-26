@@ -35,11 +35,11 @@
          */
         var drAppListUrl = @json(route('doctors.appointments.list', $doctor));
         var appModal = $('#appSaveModal');
-        var appModalTitle = $('.modal-title');
+        var appModalTitle = $('#appSaveModal .modal-title');
         var appForm = $('#appSaveForm');
         var appDate = $('#appDate');
         var appTime = $('#appTime');
-        var appSaveBtn = $('.app-save-btn');
+        var appSaveBtn = $('#appSaveModal .app-save-btn');
         var appDeleteBtn = $('#appDeleteBtn').hide();
         var appStatusRadio = $("input:radio[name=app_status]");
         var appStatusDiv = $('#appStatusDiv').hide();
@@ -162,7 +162,6 @@
                     appSaveBtn.attr('id', 'appUpdateBtn')
                         .text(appSaveBtnText).val(clickedId);
                     toggleEventRelatedHiddenElems(clicked, appDeleteBtn, appStatusDiv);
-
                 },
                 eventDrop:function(info) {
                     var dropped = info.event;
@@ -241,7 +240,6 @@
                     data: appData,
                 })
                 .done(function(response) {
-                    console.log(response);
                     updateCalendarEvent(response.appointment, calendar);
                     appModal.close();
                 })

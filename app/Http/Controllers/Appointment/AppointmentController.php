@@ -94,7 +94,7 @@ class AppointmentController extends Controller
         $updated = $this->appointments->reschedule($appointment, $request->all());
 
         return response([
-            'appointment' => $updated
+            'appointment' => $updated->load('patient')
         ]);
     }
 
