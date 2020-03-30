@@ -15,7 +15,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-body">
-                    <div id="calendar"></div>
+                    <div id="doctorCalendar"></div>
                 </div>
             </div>
         </div>
@@ -87,7 +87,7 @@
          * Calendar
          */
         document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
+            var calendarEl = document.getElementById('doctorCalendar');
             var firstWeekDay = 1;
             var eventLimit = 6;
             var dateFormat = "YYYY-MM-DD";

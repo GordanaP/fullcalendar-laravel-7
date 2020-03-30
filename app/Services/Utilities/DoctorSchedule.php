@@ -192,11 +192,6 @@ class DoctorSchedule extends AppCarbon
             $this->isOfficeDay($date) &&
             ! App::make('doctor-absences')->setDoctor($this->doctor)
                 ->isAbsenceDay($date);
-
-        // return $this->isValidDate($date) &&
-        //     $this->isEqualOrAfterToday($date) &&
-        //     App::make('business-schedule')->isBusinessDay($date) &&
-        //     $this->isOfficeDay($date);
     }
 
     /**

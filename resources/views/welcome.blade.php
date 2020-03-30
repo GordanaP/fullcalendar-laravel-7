@@ -9,28 +9,27 @@
 @endsection
 
 @section('content')
-    @php
-        $doctor = App\Doctor::first();
-    @endphp
-
-    <a href="{{ route('patients.index') }}">Patients</a>
-
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
+            <button class="btn bg-blue-400 rounded-full mb-3 text-white" id="scheduleAppBtn">
+                Schedule appointment <i class="fa fa-calendar-alt ml-2"></i>
+            </button>
+
             <div class="card">
                 <div class="card-body">
                     <div id="calendar"></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <a href="{{ route('doctors.appointments.index', App\Doctor::first()) }}">
-                {{ App\Doctor::first()->full_name }}
-            </a>
+        <div class="col-md-6">
+
         </div>
     </div>
 
     @include('partials.appointments._modal')
+
+    @include('partials.patients._patient-type-modal')
+
 @endsection
 
 @section('scripts')
@@ -40,39 +39,38 @@
          * Appointment
          */
         var appListUrl = @json(route('appointments.list'));
-        var appModal = $('#appSaveModal');
-        var appModalTitle = $('.modal-title');
-        var appTitle = $('#appTitle');
-        var appForm = $('#appSaveForm');
-        var appDate = $('#appDate');
-        var appTime = $('#appTime');
-        var appSaveBtn = $('.app-save-btn');
-        var appDeleteBtn = $('#appDeleteBtn').hide();
-        var appStatusRadio = $("input:radio[name=app_status]");
-        var appStatusDiv = $('#appStatusDiv').hide();
-        var hiddenElems = ['#appDeleteBtn', '#appStatusDiv'];
+        var scheduleAppBtn = '#scheduleAppBtn';
+
+        /**
+         * Patient
+         */
+        var patientTypeModal = $('#patientTypeModal');
+        var patientTypeRadioInput = 'input:radio[name="patient_type"]';
+        var existingPatient = 'existing';
+        var patientTypeRadio = $('input:radio[name="patient_type"]');
+        var selectPatientTypeBtn = '#selectPatientTypeBtn';
+        var patientIndexUrl = @json(route('patients.index'));
+
+        patientTypeModal.on("hidden.bs.modal", function() {
+            patientTypeRadio.checkOptionValue(existingPatient);
+        });
+
+        /**
+         * Doctor
+         */
+        var doctorIndexUrl = @json(route('doctors.index'));
 
         /**
          * Business schedule
          */
         var businessOpen = @json(App::make('business-schedule')->theEarliestOpen());
         var businessClose = @json(App::make('business-schedule')->theLatestClose());
+        var businessHours = @json(App::make('business-schedule')->businessHours());
 
         /**
-         * Doctor schedule
+         * Calendar
          */
-        var drOfficeDays = @json($doctor->business_days);
-        var drOfficeHours = @json(App::make('doctor-schedule')->setDoctor($doctor)->officeHours());
-        var drSchedulingTimeSlot = @json($doctor->app_slot);
-        var drSlotDuration = formatDateString(drSchedulingTimeSlot, 'mm', 'HH:mm:ss');
-
-        appModal.clearContentOnClose(hiddenElems);
-
         document.addEventListener('DOMContentLoaded', function() {
-
-            /**
-             * Calendar
-             */
             var calendarEl = document.getElementById('calendar');
             var firstWeekDay = 1;
             var eventLimit = 6;
@@ -84,21 +82,18 @@
                 header: {
                     left: 'prev,next',
                     center: 'title',
-                    right: 'dayGridMonth, timeGridWeek, timeGridDay, listDay'
+                    right: 'listDay'
                 },
                 navLinks: true,
                 firstDay: firstWeekDay,
                 minTime: businessOpen,
                 maxTime: businessClose,
-                businessHours: drOfficeHours,
-                slotDuration: drSlotDuration,
-                slotLabelFormat: [
-                    {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: false
-                    }
-                ],
+                businessHours: businessHours,
+                slotLabelFormat: [{
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: false
+                }],
                 eventSources: [{
                     id: 'jsonFeedUrl',
                     url: appListUrl,
@@ -113,149 +108,19 @@
                     meridiem: false,
                     hour12: false
                 },
-                dayRender: function(info) {
-                    highlightHolidays(info);
-                },
-                selectable: true,
-                selectAllow: function(info) {
-                    return isSelectable(info.start);
-                },
-                selectConstraint: 'businessHours',
-                select: function(info) {
-                    var selectedStart = info.start;
-                    var selectedDate = formatDate(selectedStart, dateFormat);
-                    var selectedTime = viewDependentEventTime(info, businessOpen)
-
-                    appModal.open();
-                    appModalTitle.text('Schedule Appointment');
-                    appTitle.val();
-                    appDate.val(selectedDate);
-                    appTime.val(selectedTime);
-                    appSaveBtn.attr('id', 'appStoreBtn').text('Schedule');
-                },
-                eventClick: function(info) {
-                    var clicked = info.event;
-                    var clickedId = clicked.id;
-                    var clickedTitle = clicked.title;
-                    var clickedStart = clicked.start;
-                    var clickedDate = formatDate(clickedStart, dateFormat);
-                    var clickedTime = formatDate(clickedStart, timeFormat);
-                    var clickedStatus = clicked.extendedProps.status;
-                    var appSaveBtnText =  isPast(clickedStart) ? 'Submit' : 'Reschedule';
-                    var appModalTitleText =  isPast(clickedStart)
-                        ? 'Mark Appointment Status' : 'Reschedule Appointment';
-
-                    appModal.open();
-                    appModalTitle.text(appModalTitleText);
-                    appTitle.val(clickedTitle);
-                    appDate.val(clickedDate);
-                    appTime.val(clickedTime);
-                    checkRadioOption(appStatusRadio, clickedStatus)
-                    appSaveBtn.attr('id', 'appUpdateBtn')
-                        .text(appSaveBtnText).val(clickedId);
-
-                    toggleEventRelatedHiddenElems(clicked, appDeleteBtn, appStatusDiv);
-                },
-                eventDrop:function(info) {
-                    var dropped = info.event;
-                    var droppedId = dropped.id;
-                    var droppedStart = dropped.start;
-                    var droppedDate = formatDate(droppedStart, dateFormat);
-                    var droppedTime = formatDate(droppedStart, timeFormat);
-                    var appUpdateUrl = '/appointments/' + droppedId;
-
-                    var droppedData = {
-                        app_date: droppedDate,
-                        app_time: droppedTime,
-                    }
-
-                    $.ajax({
-                        url: appUpdateUrl,
-                        type: 'PUT',
-                        data: droppedData,
-                    })
-                    .done(function(response) {
-                        console.log("success");
-                    })
-                    .fail(function() {
-                        console.log("error");
-                    });
-                },
-                eventOverlap: false,
-                eventAllow: function(dropInfo, draggedEvent) {
-                    return isSelectable(dropInfo.start)
-                },
-                eventConstraint: 'businessHours',
-                views: {
-                    timeGrid: {
-                        editable: true,
-                    },
-                }
             });
 
             calendar.render();
+        });
 
-            // Add appointment
-            $(document).on('click', '#appStoreBtn', function(){
-                var fields = '#appTitle, #appDate, #appTime';
-                var appData = appForm.find(fields).serializeArray();
-                var appStoreUrl = @json(route('appointments.store'));
+        $(document).on('click', scheduleAppBtn, function() {
+            patientTypeModal.open();
+        });
 
-                $.ajax({
-                    url: appStoreUrl,
-                    type: 'POST',
-                    data: appData,
-                })
-                .done(function(response) {
-                    addCalendarEvent(response.appointment, calendar)
-                    appModal.close();
-                })
-                .fail(function() {
-                    console.log("error");
-                });
-            });
-
-            // Update appointment
-            $(document).on('click', '#appUpdateBtn', function(){
-                var appId = $(this).val();
-                var date = appDate.val();
-                var time = appTime.val();
-                var appStart = dateTimeString(date, time);
-                var fields = isPast(appStart) ? 'input[name="app_status"]' : '#appDate, #appTime';
-                var appData = appForm.find(fields).serializeArray();
-                var appUpdateUrl = '/appointments/'+appId;
-
-                $.ajax({
-                    url: appUpdateUrl,
-                    type: 'PUT',
-                    data: appData,
-                })
-                .done(function(response) {
-                    updateCalendarEvent(response.appointment, calendar);
-                    appModal.close();
-                })
-                .fail(function() {
-                    console.log("error");
-                });
-            });
-
-            // Delete appointment
-            $(document).on('click', '#appDeleteBtn', function() {
-                var appId = $(this).val();
-                var appDeleteUrl = '/appointments/'+ appId;
-
-                $.ajax({
-                    url: appDeleteUrl,
-                    type: 'DELETE',
-                })
-                .done(function(response) {
-                    removeCalendarEvent(appId, calendar);
-                    appModal.close();
-                })
-                .fail(function() {
-                    console.log("error");
-                });
-            });
+        $(document).on('click', selectPatientTypeBtn, function() {
+            var checked = $(patientTypeRadioInput + ':checked').val();
+            checked == existingPatient
+                ? redirectTo(patientIndexUrl) : redirectTo(doctorIndexUrl);
         });
 
     </script>

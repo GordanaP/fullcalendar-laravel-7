@@ -42,6 +42,7 @@
 <script src="{{ asset('js/fc_datepicker.js') }}"></script>
 <script src="{{ asset('js/modal_helpers.js') }}"></script>
 <script src="{{ asset('js/form_helpers.js') }}"></script>
+<script src="{{ asset('js/other_helpers.js') }}"></script>
 
 @yield('scripts')
 

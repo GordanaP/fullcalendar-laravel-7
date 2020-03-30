@@ -46,6 +46,11 @@ Route::post('doctors/{doctor}/scheduling-time-slots',
 Route::resource('patients', 'Patient\PatientController');
 
 /**
+ * Doctor
+ */
+Route::resource('doctors', 'Doctor\DoctorController');
+
+/**
  * Home
  */
 Route::get('/home', 'HomeController@index')->name('home');

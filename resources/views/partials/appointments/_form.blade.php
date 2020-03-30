@@ -4,11 +4,11 @@
     <div class="form-group">
         <label for="doctor">Doctor:</label>
         <input type="text" class="form-control" id="doctor"
-        value="{{ $doctor->full_name }}" disabled>
+        value="{{ $doctor->full_name ?? null }}" disabled>
     </div>
 
     <!-- Patient -->
-    @if (! $patient)
+    @if (! isset($patient) )
         <div id="patientDetails">
             <div class="form-group">
                 <label for="firstName">Patient First Name:</label>
@@ -42,7 +42,7 @@
         <div class="form-group">
             <label for="patient">Patient:</label>
             <input type="text" class="form-control" id="patient"
-            value="{{ $patient->full_name }}" disabled>
+            value="{{ $patient->full_name ?? null }}" disabled>
         </div>
     @endif
 

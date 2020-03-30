@@ -6,6 +6,9 @@
 
 <title>{{ config('app.name', 'Laravel') }}</title>
 
+<!-- Font -->
+<link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+
 <!-- Fullcalendar -->
 <link href="{{ asset('vendor/fullcalendar-4.3.1/packages/core/main.css') }}" rel='stylesheet' />
 <link href="{{ asset('vendor/fullcalendar-4.3.1/packages/daygrid/main.css') }}" rel='stylesheet' />

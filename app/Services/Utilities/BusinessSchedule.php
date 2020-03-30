@@ -3,11 +3,28 @@
 namespace App\Services\Utilities;
 
 use App\BusinessDay;
-use App\Services\Utilities\AppCarbon;
 use Illuminate\Support\Facades\App;
+use App\Services\Utilities\AppCarbon;
+use Illuminate\Support\Collection;
 
 class BusinessSchedule extends AppCarbon
 {
+    /**
+     * The busimess operating hours.
+     */
+    public function businessHours(): Collection
+    {
+        $collection = BusinessDay::all();
+
+        return $collection->map(function($day) {
+            return collect([
+                'daysOfWeek'=> [$day->iso],
+                'startTime' => $this->parse($day->open)->format('H:s'),
+                'endTime' => $this->parse($day->close)->format('H:s'),
+            ]);
+        });
+    }
+
     /**
      * The earliest business open time.
      */
